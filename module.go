@@ -4,7 +4,7 @@ import "github.com/tinh-tinh/tinhtinh/core"
 
 const JWT_TOKEN core.Provide = "JWT_TOKEN"
 
-func Register(opt Options) core.Module {
+func Register(opt JwtOptions) core.Module {
 	return func(module *core.DynamicModule) *core.DynamicModule {
 		tokenModule := module.New(core.NewModuleOptions{})
 		tokenModule.NewProvider(core.ProviderOptions{
