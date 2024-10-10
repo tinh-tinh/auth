@@ -16,3 +16,11 @@ func Register(opt JwtOptions) core.Module {
 		return tokenModule
 	}
 }
+
+func InjectJwt(module *core.DynamicModule) Jwt {
+	jwtService, ok := module.Ref(JWT_TOKEN).(Jwt)
+	if !ok {
+		return nil
+	}
+	return jwtService
+}
