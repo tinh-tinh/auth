@@ -33,8 +33,7 @@ func Test_Role(t *testing.T) {
 			})
 		})
 
-		ctrl.Metadata(Roles("admin")).Guard(Guard).Post("", func(ctx core.Ctx) {
-			fmt.Println(ctx.Get(USER))
+		ctrl.Metadata(Roles("admin")).Guard(RoleGuard, Guard).Post("", func(ctx core.Ctx) {
 			ctx.JSON(core.Map{
 				"data": "ok",
 			})
@@ -97,5 +96,5 @@ func Test_Role(t *testing.T) {
 
 	resp, err = testClient.Do(req)
 	require.Nil(t, err)
-	require.Equal(t, 200, resp.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
