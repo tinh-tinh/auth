@@ -1,7 +1,6 @@
 package throttler
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -61,7 +60,6 @@ func Test_Throttler(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		resp, err = testClient.Do(req)
 		require.Nil(t, err)
-		fmt.Println(resp.StatusCode)
 		if i < 5 {
 			require.Equal(t, http.StatusOK, resp.StatusCode)
 		} else {
