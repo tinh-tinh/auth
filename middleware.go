@@ -14,7 +14,13 @@ func Guard(ctrl *core.DynamicController, ctx *core.Ctx) bool {
 	if header == "" {
 		return false
 	}
-	token := strings.Split(header, " ")[1]
+	authorization := strings.Split(header, " ")
+	var token string
+	if len(authorization) > 1 {
+		token = authorization[1]
+	} else {
+		return false
+	}
 
 	payload, err := tokenService.Verify(token)
 	if err != nil {
