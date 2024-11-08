@@ -22,10 +22,10 @@ func (cry *Crypto) Encrypt(plainText string) string {
 		panic(err)
 	}
 
-	gcm, err := cipher.NewGCM(aes)
-	if err != nil {
-		panic(err)
-	}
+	gcm, _ := cipher.NewGCM(aes)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	nonce := make([]byte, gcm.NonceSize())
 	_, err = rand.Read(nonce)
@@ -43,10 +43,10 @@ func (cry *Crypto) Decrypt(cipherText string) string {
 		panic(err)
 	}
 
-	gcm, err := cipher.NewGCM(aes)
-	if err != nil {
-		panic(err)
-	}
+	gcm, _ := cipher.NewGCM(aes)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	nonceSize := gcm.NonceSize()
 	nonce, ciphertext := cipherText[:nonceSize], cipherText[nonceSize:]

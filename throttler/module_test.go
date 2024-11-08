@@ -14,8 +14,8 @@ func Test_Throttler(t *testing.T) {
 	authController := func(module *core.DynamicModule) *core.DynamicController {
 		ctrl := module.NewController("test")
 
-		ctrl.Guard(Guard).Get("", func(ctx core.Ctx) {
-			ctx.JSON(core.Map{
+		ctrl.Guard(Guard).Get("", func(ctx core.Ctx) error {
+			return ctx.JSON(core.Map{
 				"data": "ok",
 			})
 		})
