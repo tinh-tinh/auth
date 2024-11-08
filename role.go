@@ -14,7 +14,7 @@ func Roles(roles ...string) *core.Metadata {
 }
 
 func RoleGuard(ctrl *core.DynamicController, ctx *core.Ctx) bool {
-	roles, ok := ctrl.GetMetadata(ROLES).([]string)
+	roles, ok := ctx.GetMetadata(ROLES).([]string)
 	if !ok {
 		return true
 	}

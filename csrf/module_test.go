@@ -16,14 +16,14 @@ func Test_Module(t *testing.T) {
 		ctrl := module.NewController("test")
 		csrf := InjectCSRF(module)
 
-		ctrl.Get("", func(ctx core.Ctx) {
-			ctx.JSON(core.Map{
+		ctrl.Get("", func(ctx core.Ctx) error {
+			return ctx.JSON(core.Map{
 				"data": csrf.Generate(ctx.Req()),
 			})
 		})
 
-		ctrl.Guard(Guard).Post("", func(ctx core.Ctx) {
-			ctx.JSON(core.Map{
+		ctrl.Guard(Guard).Post("", func(ctx core.Ctx) error {
+			return ctx.JSON(core.Map{
 				"data": "ok",
 			})
 		})

@@ -20,21 +20,21 @@ func Test_Guard(t *testing.T) {
 		ctrl := module.NewController("test")
 		jwtService := InjectJwt(module)
 
-		ctrl.Get("", func(ctx core.Ctx) {
+		ctrl.Get("", func(ctx core.Ctx) error {
 			data, err := jwtService.Generate(jwt.MapClaims{
 				"roles": []string{"admin", "user"},
 			})
 
 			if err != nil {
-				common.BadRequestException(ctx.Res(), err.Error())
+				return common.BadRequestException(ctx.Res(), err.Error())
 			}
-			ctx.JSON(core.Map{
+			return ctx.JSON(core.Map{
 				"data": data,
 			})
 		})
 
-		ctrl.Guard(Guard).Post("", func(ctx core.Ctx) {
-			ctx.JSON(core.Map{
+		ctrl.Guard(Guard).Post("", func(ctx core.Ctx) error {
+			return ctx.JSON(core.Map{
 				"data": "ok",
 			})
 		})
