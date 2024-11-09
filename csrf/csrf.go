@@ -133,10 +133,6 @@ func DefaultConfig(config *Config) (*Config, error) {
 		defaultConfig.CookieOptions.Path = config.CookieOptions.Path
 	}
 
-	if config.CookieOptions.MaxAge != 0 {
-		defaultConfig.CookieOptions.MaxAge = config.CookieOptions.MaxAge
-	}
-
 	return defaultConfig, nil
 }
 
