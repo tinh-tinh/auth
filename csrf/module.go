@@ -20,7 +20,7 @@ func Register(opt *Config) core.Module {
 	}
 }
 
-func InjectCSRF(module *core.DynamicModule) *Config {
+func Inject(module *core.DynamicModule) *Config {
 	csrf, ok := module.Ref(CSRF_NAME).(*Config)
 	if !ok {
 		return nil

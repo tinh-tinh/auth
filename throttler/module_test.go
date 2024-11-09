@@ -1,4 +1,4 @@
-package throttler
+package throttler_test
 
 import (
 	"net/http"
@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"github.com/tinh-tinh/auth/throttler"
 	"github.com/tinh-tinh/tinhtinh/core"
 )
 
@@ -14,7 +15,7 @@ func Test_Throttler(t *testing.T) {
 	authController := func(module *core.DynamicModule) *core.DynamicController {
 		ctrl := module.NewController("test")
 
-		ctrl.Guard(Guard).Get("", func(ctx core.Ctx) error {
+		ctrl.Guard(throttler.Guard).Get("", func(ctx core.Ctx) error {
 			return ctx.JSON(core.Map{
 				"data": "ok",
 			})
@@ -34,7 +35,7 @@ func Test_Throttler(t *testing.T) {
 	appModule := func() *core.DynamicModule {
 		appMod := core.NewModule(core.NewModuleOptions{
 			Imports: []core.Module{
-				ForRoot(&Config{Limit: 5, Ttl: 1 * time.Second}),
+				throttler.ForRoot(&throttler.Config{Limit: 5, Ttl: 1 * time.Second}),
 				authModule,
 			},
 		})

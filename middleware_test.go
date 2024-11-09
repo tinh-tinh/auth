@@ -1,4 +1,4 @@
-package auth
+package auth_test
 
 import (
 	"encoding/json"
@@ -11,6 +11,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/require"
+	"github.com/tinh-tinh/auth"
 	"github.com/tinh-tinh/tinhtinh/common"
 	"github.com/tinh-tinh/tinhtinh/core"
 )
@@ -18,7 +19,7 @@ import (
 func Test_Guard(t *testing.T) {
 	authController := func(module *core.DynamicModule) *core.DynamicController {
 		ctrl := module.NewController("test")
-		jwtService := InjectJwt(module)
+		jwtService := auth.InjectJwt(module)
 
 		ctrl.Get("", func(ctx core.Ctx) error {
 			data, err := jwtService.Generate(jwt.MapClaims{
@@ -33,7 +34,7 @@ func Test_Guard(t *testing.T) {
 			})
 		})
 
-		ctrl.Guard(Guard).Post("", func(ctx core.Ctx) error {
+		ctrl.Guard(auth.Guard).Post("", func(ctx core.Ctx) error {
 			return ctx.JSON(core.Map{
 				"data": "ok",
 			})
@@ -53,7 +54,7 @@ func Test_Guard(t *testing.T) {
 	appModule := func() *core.DynamicModule {
 		appMod := core.NewModule(core.NewModuleOptions{
 			Imports: []core.Module{
-				Register(JwtOptions{
+				auth.Register(auth.JwtOptions{
 					Alg:    jwt.SigningMethodHS256,
 					Secret: "secret",
 					Exp:    time.Hour,

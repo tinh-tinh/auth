@@ -1,4 +1,4 @@
-package csrf
+package csrf_test
 
 import (
 	"encoding/json"
@@ -8,21 +8,22 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/tinh-tinh/auth/csrf"
 	"github.com/tinh-tinh/tinhtinh/core"
 )
 
 func Test_Module(t *testing.T) {
 	authController := func(module *core.DynamicModule) *core.DynamicController {
 		ctrl := module.NewController("test")
-		csrf := InjectCSRF(module)
+		csrfToken := csrf.Inject(module)
 
 		ctrl.Get("", func(ctx core.Ctx) error {
 			return ctx.JSON(core.Map{
-				"data": csrf.Generate(ctx.Req()),
+				"data": csrfToken.Generate(ctx.Req()),
 			})
 		})
 
-		ctrl.Guard(Guard).Post("", func(ctx core.Ctx) error {
+		ctrl.Guard(csrf.Guard).Post("", func(ctx core.Ctx) error {
 			return ctx.JSON(core.Map{
 				"data": "ok",
 			})
@@ -42,7 +43,7 @@ func Test_Module(t *testing.T) {
 	appModule := func() *core.DynamicModule {
 		appMod := core.NewModule(core.NewModuleOptions{
 			Imports: []core.Module{
-				Register(&Config{
+				csrf.Register(&csrf.Config{
 					GetSecret: func() string {
 						return "my-secret-string"
 					},
@@ -95,4 +96,8 @@ func Test_Module(t *testing.T) {
 	resp, err = testClient.Do(req)
 	require.Nil(t, err)
 	require.Equal(t, http.StatusOK, resp.StatusCode)
+
+	resp, err = testClient.Post(testServer.URL+"/api/test", "application/json", nil)
+	require.Nil(t, err)
+	require.Equal(t, http.StatusForbidden, resp.StatusCode)
 }
