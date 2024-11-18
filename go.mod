@@ -7,12 +7,10 @@ require (
 	github.com/markbates/goth v1.80.0
 	github.com/pquerna/otp v1.4.0
 	github.com/stretchr/testify v1.9.0
-	github.com/tinh-tinh/tinhtinh v1.2.2
+	github.com/tinh-tinh/tinhtinh v1.2.4
 )
 
 require (
-	cloud.google.com/go/compute v1.20.1 // indirect
-	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/golang/protobuf v1.5.3 // indirect

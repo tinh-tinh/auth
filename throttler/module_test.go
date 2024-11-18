@@ -1,6 +1,7 @@
 package throttler_test
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -67,4 +68,56 @@ func Test_Throttler(t *testing.T) {
 			require.Equal(t, http.StatusForbidden, resp.StatusCode)
 		}
 	}
+}
+
+func BenchmarkXxx(b *testing.B) {
+	authController := func(module *core.DynamicModule) *core.DynamicController {
+		ctrl := module.NewController("test")
+
+		ctrl.Guard(throttler.Guard).Get("", func(ctx core.Ctx) error {
+			return ctx.JSON(core.Map{
+				"data": "ok",
+			})
+		})
+
+		return ctrl
+	}
+
+	authModule := func(module *core.DynamicModule) *core.DynamicModule {
+		mod := module.New(core.NewModuleOptions{
+			Controllers: []core.Controller{authController},
+		})
+
+		return mod
+	}
+
+	appModule := func() *core.DynamicModule {
+		appMod := core.NewModule(core.NewModuleOptions{
+			Imports: []core.Module{
+				throttler.ForRoot(&throttler.Config{Limit: 100, Ttl: 10 * time.Second}),
+				authModule,
+			},
+		})
+
+		return appMod
+	}
+
+	app := core.CreateFactory(appModule)
+	app.SetGlobalPrefix("api")
+
+	testServer := httptest.NewServer(app.PrepareBeforeListen())
+	defer testServer.Close()
+
+	testClient := testServer.Client()
+	req, err := http.NewRequest("GET", testServer.URL+"/api/test", nil)
+	require.Nil(b, err)
+	req.Header.Set("X-Forwarded-For", "127.0.0.1")
+
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			resp, err := testClient.Do(req)
+			require.Nil(b, err)
+			fmt.Println(resp.StatusCode)
+		}
+	})
 }
