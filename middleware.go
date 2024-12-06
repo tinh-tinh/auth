@@ -8,8 +8,8 @@ import (
 
 const USER core.CtxKey = "USER"
 
-func Guard(ctrl *core.DynamicController, ctx *core.Ctx) bool {
-	tokenService := ctrl.Inject(JWT_TOKEN).(Jwt)
+func Guard(ctrl core.RefProvider, ctx *core.Ctx) bool {
+	tokenService := ctrl.Ref(JWT_TOKEN).(Jwt)
 	header := ctx.Headers("Authorization")
 	if header == "" {
 		return false
