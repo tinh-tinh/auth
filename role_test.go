@@ -34,7 +34,7 @@ func Test_Role(t *testing.T) {
 			})
 		})
 
-		ctrl.Metadata(auth.Roles("admin")).Guard(auth.RoleGuard, auth.Guard).Post("", func(ctx core.Ctx) error {
+		ctrl.Metadata(auth.Roles("admin")).Guard(auth.Guard, auth.RoleGuard).Post("", func(ctx core.Ctx) error {
 			return ctx.JSON(core.Map{
 				"data": "ok",
 			})

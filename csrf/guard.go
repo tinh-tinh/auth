@@ -5,8 +5,8 @@ import (
 	"github.com/tinh-tinh/tinhtinh/core"
 )
 
-func Guard(ctrl *core.DynamicController, ctx *core.Ctx) bool {
-	csrf, ok := ctrl.Inject(CSRF_NAME).(*Config)
+func Guard(ctrl core.RefProvider, ctx *core.Ctx) bool {
+	csrf, ok := ctrl.Ref(CSRF_NAME).(*Config)
 	if !ok {
 		common.InternalServerException(ctx.Res(), "csrf not registered")
 		return false
