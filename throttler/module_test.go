@@ -8,12 +8,12 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tinh-tinh/auth/throttler"
-	"github.com/tinh-tinh/tinhtinh/core"
+	"github.com/tinh-tinh/auth/v2/throttler"
+	"github.com/tinh-tinh/tinhtinh/v2/core"
 )
 
 func Test_Throttler(t *testing.T) {
-	authController := func(module *core.DynamicModule) *core.DynamicController {
+	authController := func(module core.Module) core.Controller {
 		ctrl := module.NewController("test")
 
 		ctrl.Guard(throttler.Guard).Get("", func(ctx core.Ctx) error {
@@ -25,17 +25,17 @@ func Test_Throttler(t *testing.T) {
 		return ctrl
 	}
 
-	authModule := func(module *core.DynamicModule) *core.DynamicModule {
+	authModule := func(module core.Module) core.Module {
 		mod := module.New(core.NewModuleOptions{
-			Controllers: []core.Controller{authController},
+			Controllers: []core.Controllers{authController},
 		})
 
 		return mod
 	}
 
-	appModule := func() *core.DynamicModule {
+	appModule := func() core.Module {
 		appMod := core.NewModule(core.NewModuleOptions{
-			Imports: []core.Module{
+			Imports: []core.Modules{
 				throttler.ForRoot(&throttler.Config{Limit: 5, Ttl: 1 * time.Second}),
 				authModule,
 			},
@@ -71,7 +71,7 @@ func Test_Throttler(t *testing.T) {
 }
 
 func BenchmarkXxx(b *testing.B) {
-	authController := func(module *core.DynamicModule) *core.DynamicController {
+	authController := func(module core.Module) core.Controller {
 		ctrl := module.NewController("test")
 
 		ctrl.Guard(throttler.Guard).Get("", func(ctx core.Ctx) error {
@@ -83,17 +83,17 @@ func BenchmarkXxx(b *testing.B) {
 		return ctrl
 	}
 
-	authModule := func(module *core.DynamicModule) *core.DynamicModule {
+	authModule := func(module core.Module) core.Module {
 		mod := module.New(core.NewModuleOptions{
-			Controllers: []core.Controller{authController},
+			Controllers: []core.Controllers{authController},
 		})
 
 		return mod
 	}
 
-	appModule := func() *core.DynamicModule {
+	appModule := func() core.Module {
 		appMod := core.NewModule(core.NewModuleOptions{
-			Imports: []core.Module{
+			Imports: []core.Modules{
 				throttler.ForRoot(&throttler.Config{Limit: 100, Ttl: 10 * time.Second}),
 				authModule,
 			},

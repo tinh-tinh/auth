@@ -1,11 +1,11 @@
 package auth
 
-import "github.com/tinh-tinh/tinhtinh/core"
+import "github.com/tinh-tinh/tinhtinh/v2/core"
 
 const JWT_TOKEN core.Provide = "JWT_TOKEN"
 
-func Register(opt JwtOptions) core.Module {
-	return func(module *core.DynamicModule) *core.DynamicModule {
+func Register(opt JwtOptions) core.Modules {
+	return func(module core.Module) core.Module {
 		tokenModule := module.New(core.NewModuleOptions{})
 		tokenModule.NewProvider(core.ProviderOptions{
 			Name:  JWT_TOKEN,
@@ -17,7 +17,7 @@ func Register(opt JwtOptions) core.Module {
 	}
 }
 
-func InjectJwt(module *core.DynamicModule) Jwt {
+func InjectJwt(module core.Module) Jwt {
 	jwtService, ok := module.Ref(JWT_TOKEN).(Jwt)
 	if !ok {
 		return nil

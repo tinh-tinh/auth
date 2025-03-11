@@ -3,8 +3,8 @@ package throttler
 import (
 	"time"
 
-	"github.com/tinh-tinh/tinhtinh/common/memory"
-	"github.com/tinh-tinh/tinhtinh/core"
+	"github.com/tinh-tinh/tinhtinh/v2/common/memory"
+	"github.com/tinh-tinh/tinhtinh/v2/core"
 )
 
 type Config struct {
@@ -29,9 +29,9 @@ func New(config *Config) *Throttler {
 
 const THROTTLER core.Provide = "THROTTLER"
 
-func ForRoot(config *Config) core.Module {
+func ForRoot(config *Config) core.Modules {
 	throttler := New(config)
-	return func(module *core.DynamicModule) *core.DynamicModule {
+	return func(module core.Module) core.Module {
 		throttlerModule := module.New(core.NewModuleOptions{})
 
 		throttlerModule.NewProvider(core.ProviderOptions{
@@ -44,7 +44,7 @@ func ForRoot(config *Config) core.Module {
 	}
 }
 
-func Guard(ctrl core.RefProvider, ctx *core.Ctx) bool {
+func Guard(ctrl core.RefProvider, ctx core.Ctx) bool {
 	ip := ctx.Headers("X-Forwarded-For")
 	if ip == "" {
 		ip = ctx.Req().RemoteAddr

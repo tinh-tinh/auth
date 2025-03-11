@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tinh-tinh/auth/csrf"
+	"github.com/tinh-tinh/auth/v2/csrf"
 )
 
 func Test_Csrf(t *testing.T) {

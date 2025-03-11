@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tinh-tinh/auth"
+	"github.com/tinh-tinh/auth/v2"
 )
 
 func Test_Crypto(t *testing.T) {

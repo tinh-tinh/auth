@@ -5,7 +5,7 @@ import (
 
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
-	"github.com/tinh-tinh/tinhtinh/core"
+	"github.com/tinh-tinh/tinhtinh/v2/core"
 )
 
 type Totp struct{}
@@ -32,8 +32,8 @@ func (tp *Totp) Generate(opts totp.GenerateOpts) (*otp.Key, error) {
 
 const TOTP core.Provide = "TOTP"
 
-func Register() core.Module {
-	return func(module *core.DynamicModule) *core.DynamicModule {
+func Register() core.Modules {
+	return func(module core.Module) core.Module {
 		twoFAModule := module.New(core.NewModuleOptions{})
 
 		twoFAModule.NewProvider(core.ProviderOptions{
@@ -45,7 +45,7 @@ func Register() core.Module {
 	}
 }
 
-func Inject(module *core.DynamicModule) *Totp {
+func Inject(module core.Module) *Totp {
 	val, ok := module.Ref(TOTP).(*Totp)
 	if !ok {
 		return nil
