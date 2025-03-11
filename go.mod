@@ -1,4 +1,4 @@
-module github.com/tinh-tinh/auth
+module github.com/tinh-tinh/auth/v2
 
 go 1.22.0
 
@@ -7,7 +7,7 @@ require (
 	github.com/markbates/goth v1.80.0
 	github.com/pquerna/otp v1.4.0
 	github.com/stretchr/testify v1.9.0
-	github.com/tinh-tinh/tinhtinh v1.4.0
+	github.com/tinh-tinh/tinhtinh/v2 v2.0.0
 )
 
 require (

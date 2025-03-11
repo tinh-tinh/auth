@@ -11,13 +11,13 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/require"
-	"github.com/tinh-tinh/auth"
-	"github.com/tinh-tinh/tinhtinh/common"
-	"github.com/tinh-tinh/tinhtinh/core"
+	"github.com/tinh-tinh/auth/v2"
+	"github.com/tinh-tinh/tinhtinh/v2/common"
+	"github.com/tinh-tinh/tinhtinh/v2/core"
 )
 
 func Test_Role(t *testing.T) {
-	authController := func(module *core.DynamicModule) *core.DynamicController {
+	authController := func(module core.Module) core.Controller {
 		ctrl := module.NewController("test")
 		jwtService := auth.InjectJwt(module)
 
@@ -43,17 +43,17 @@ func Test_Role(t *testing.T) {
 		return ctrl
 	}
 
-	authModule := func(module *core.DynamicModule) *core.DynamicModule {
+	authModule := func(module core.Module) core.Module {
 		mod := module.New(core.NewModuleOptions{
-			Controllers: []core.Controller{authController},
+			Controllers: []core.Controllers{authController},
 		})
 
 		return mod
 	}
 
-	appModule := func() *core.DynamicModule {
+	appModule := func() core.Module {
 		appMod := core.NewModule(core.NewModuleOptions{
-			Imports: []core.Module{
+			Imports: []core.Modules{
 				auth.Register(auth.JwtOptions{
 					Alg:    jwt.SigningMethodHS256,
 					Secret: "secret",

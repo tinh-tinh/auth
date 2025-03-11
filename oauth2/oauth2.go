@@ -5,8 +5,8 @@ import (
 
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
-	"github.com/tinh-tinh/tinhtinh/common"
-	"github.com/tinh-tinh/tinhtinh/core"
+	"github.com/tinh-tinh/tinhtinh/v2/common"
+	"github.com/tinh-tinh/tinhtinh/v2/core"
 )
 
 type Config struct {
@@ -17,11 +17,11 @@ type Config struct {
 
 const OAUTH core.Provide = "OAUTH"
 
-func Register(config *Config) core.Module {
-	return func(module *core.DynamicModule) *core.DynamicModule {
+func Register(config *Config) core.Modules {
+	return func(module core.Module) core.Module {
 		goth.UseProviders(config.Provider)
 		options := core.NewModuleOptions{
-			Providers: []core.Provider{func(module *core.DynamicModule) *core.DynamicProvider {
+			Providers: []core.Providers{func(module core.Module) core.Provider {
 				prd := module.NewProvider(core.ProviderOptions{
 					Name:  OAUTH,
 					Value: config,
@@ -31,7 +31,7 @@ func Register(config *Config) core.Module {
 		}
 
 		if !config.OverrideRoutes {
-			options.Controllers = []core.Controller{controller}
+			options.Controllers = []core.Controllers{controller}
 		}
 		oauth2Module := module.New(options)
 		oauth2Module.Export(OAUTH)
@@ -40,7 +40,7 @@ func Register(config *Config) core.Module {
 	}
 }
 
-func Inject(module *core.DynamicModule) *Config {
+func Inject(module core.Module) *Config {
 	val, ok := module.Ref(OAUTH).(*Config)
 	if !ok {
 		return nil
@@ -48,7 +48,7 @@ func Inject(module *core.DynamicModule) *Config {
 	return val
 }
 
-func controller(module *core.DynamicModule) *core.DynamicController {
+func controller(module core.Module) core.Controller {
 	ctrl := module.NewController("oauth2")
 	config := module.Ref(OAUTH).(*Config)
 
