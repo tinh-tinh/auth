@@ -3,12 +3,12 @@ package auth
 import (
 	"strings"
 
-	"github.com/tinh-tinh/tinhtinh/core"
+	"github.com/tinh-tinh/tinhtinh/v2/core"
 )
 
 const USER core.CtxKey = "USER"
 
-func Guard(ctrl core.RefProvider, ctx *core.Ctx) bool {
+func Guard(ctrl core.RefProvider, ctx core.Ctx) bool {
 	tokenService := ctrl.Ref(JWT_TOKEN).(Jwt)
 	header := ctx.Headers("Authorization")
 	if header == "" {

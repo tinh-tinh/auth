@@ -10,12 +10,12 @@ import (
 
 	"github.com/pquerna/otp/totp"
 	"github.com/stretchr/testify/require"
-	"github.com/tinh-tinh/auth/twofa"
-	"github.com/tinh-tinh/tinhtinh/core"
+	"github.com/tinh-tinh/auth/v2/twofa"
+	"github.com/tinh-tinh/tinhtinh/v2/core"
 )
 
 func TestModule(t *testing.T) {
-	authController := func(module *core.DynamicModule) *core.DynamicController {
+	authController := func(module core.Module) core.Controller {
 		ctrl := module.NewController("test")
 		totpCode := twofa.Inject(module)
 
@@ -44,17 +44,17 @@ func TestModule(t *testing.T) {
 		return ctrl
 	}
 
-	authModule := func(module *core.DynamicModule) *core.DynamicModule {
+	authModule := func(module core.Module) core.Module {
 		mod := module.New(core.NewModuleOptions{
-			Controllers: []core.Controller{authController},
+			Controllers: []core.Controllers{authController},
 		})
 
 		return mod
 	}
 
-	appModule := func() *core.DynamicModule {
+	appModule := func() core.Module {
 		appMod := core.NewModule(core.NewModuleOptions{
-			Imports: []core.Module{
+			Imports: []core.Modules{
 				twofa.Register(),
 				authModule,
 			},

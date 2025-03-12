@@ -8,12 +8,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tinh-tinh/auth/csrf"
-	"github.com/tinh-tinh/tinhtinh/core"
+	"github.com/tinh-tinh/auth/v2/csrf"
+	"github.com/tinh-tinh/tinhtinh/v2/core"
 )
 
 func Test_Module(t *testing.T) {
-	authController := func(module *core.DynamicModule) *core.DynamicController {
+	authController := func(module core.Module) core.Controller {
 		ctrl := module.NewController("test")
 		csrfToken := csrf.Inject(module)
 
@@ -32,17 +32,17 @@ func Test_Module(t *testing.T) {
 		return ctrl
 	}
 
-	authModule := func(module *core.DynamicModule) *core.DynamicModule {
+	authModule := func(module core.Module) core.Module {
 		mod := module.New(core.NewModuleOptions{
-			Controllers: []core.Controller{authController},
+			Controllers: []core.Controllers{authController},
 		})
 
 		return mod
 	}
 
-	appModule := func() *core.DynamicModule {
+	appModule := func() core.Module {
 		appMod := core.NewModule(core.NewModuleOptions{
-			Imports: []core.Module{
+			Imports: []core.Modules{
 				csrf.Register(&csrf.Config{
 					GetSecret: func() string {
 						return "my-secret-string"
