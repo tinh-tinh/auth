@@ -17,7 +17,7 @@ func Register(opt JwtOptions) core.Modules {
 	}
 }
 
-func InjectJwt(module core.Module) Jwt {
+func InjectJwt(module core.RefProvider) Jwt {
 	jwtService, ok := module.Ref(JWT_TOKEN).(Jwt)
 	if !ok {
 		return nil

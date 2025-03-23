@@ -40,7 +40,7 @@ func Register(config *Config) core.Modules {
 	}
 }
 
-func Inject(module core.Module) *Config {
+func Inject(module core.RefProvider) *Config {
 	val, ok := module.Ref(OAUTH).(*Config)
 	if !ok {
 		return nil

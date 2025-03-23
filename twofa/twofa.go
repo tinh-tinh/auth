@@ -45,7 +45,7 @@ func Register() core.Modules {
 	}
 }
 
-func Inject(module core.Module) *Totp {
+func Inject(module core.RefProvider) *Totp {
 	val, ok := module.Ref(TOTP).(*Totp)
 	if !ok {
 		return nil
