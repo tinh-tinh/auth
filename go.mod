@@ -3,7 +3,7 @@ module github.com/tinh-tinh/auth/v2
 go 1.22.0
 
 require (
-	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/markbates/goth v1.80.0
 	github.com/pquerna/otp v1.4.0
 	github.com/stretchr/testify v1.9.0
