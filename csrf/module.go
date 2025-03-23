@@ -20,7 +20,7 @@ func Register(opt *Config) core.Modules {
 	}
 }
 
-func Inject(module core.Module) *Config {
+func Inject(module core.RefProvider) *Config {
 	csrf, ok := module.Ref(CSRF_NAME).(*Config)
 	if !ok {
 		return nil
