@@ -14,5 +14,5 @@ Auth utilities for Tinh Tinh based on JWT
 ## Install 
 
 ```bash
-go get -u github.com/tinh-tinh/auth
+go get -u github.com/tinh-tinh/auth/v2
 ```
