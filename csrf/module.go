@@ -20,6 +20,25 @@ func Register(opt *Config) core.Modules {
 	}
 }
 
+type ConfigFactory func(ref core.RefProvider) *Config
+
+func RegisterFactory(factory ConfigFactory) core.Modules {
+	return func(module core.Module) core.Module {
+		opt := factory(module)
+		csrf, err := DefaultConfig(opt)
+		if err != nil {
+			panic(err)
+		}
+		csrfModule := module.New(core.NewModuleOptions{})
+		csrfModule.NewProvider(core.ProviderOptions{
+			Name:  CSRF_NAME,
+			Value: csrf,
+		})
+		csrfModule.Export(CSRF_NAME)
+		return csrfModule
+	}
+}
+
 func Inject(module core.RefProvider) *Config {
 	csrf, ok := module.Ref(CSRF_NAME).(*Config)
 	if !ok {

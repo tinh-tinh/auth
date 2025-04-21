@@ -40,6 +40,44 @@ func Test_Role(t *testing.T) {
 			})
 		})
 
+		ctrl.Guard(auth.RoleGuard).Put("", func(ctx core.Ctx) error {
+			return ctx.JSON(core.Map{
+				"data": "ok",
+			})
+		})
+
+		ctrl.Metadata(auth.Roles("admin")).Guard(auth.RoleGuard).Patch("", func(ctx core.Ctx) error {
+			return ctx.JSON(core.Map{
+				"data": "ok",
+			})
+		})
+
+		ctrl.Get("failed-roles-type", func(ctx core.Ctx) error {
+			data, err := jwtService.Generate(jwt.MapClaims{
+				"roles": []int{1, 2, 3},
+			})
+
+			if err != nil {
+				return common.BadRequestException(ctx.Res(), err.Error())
+			}
+			return ctx.JSON(core.Map{
+				"data": data,
+			})
+		})
+
+		ctrl.Get("failed-roles-format", func(ctx core.Ctx) error {
+			data, err := jwtService.Generate(jwt.MapClaims{
+				"roles": "haha",
+			})
+
+			if err != nil {
+				return common.BadRequestException(ctx.Res(), err.Error())
+			}
+			return ctx.JSON(core.Map{
+				"data": data,
+			})
+		})
+
 		return ctrl
 	}
 
@@ -100,6 +138,58 @@ func Test_Role(t *testing.T) {
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 
 	resp, err = testClient.Post(testServer.URL+"/api/test", "application/json", nil)
+	require.Nil(t, err)
+	require.Equal(t, http.StatusForbidden, resp.StatusCode)
+
+	req, err = http.NewRequest("PUT", testServer.URL+"/api/test", nil)
+	require.Nil(t, err)
+
+	resp, err = testClient.Do(req)
+	require.Nil(t, err)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+
+	req, err = http.NewRequest("PATCH", testServer.URL+"/api/test", nil)
+	require.Nil(t, err)
+
+	resp, err = testClient.Do(req)
+	require.Nil(t, err)
+	require.Equal(t, http.StatusForbidden, resp.StatusCode)
+
+	req, err = http.NewRequest("GET", testServer.URL+"/api/test/failed-roles-type", nil)
+	require.Nil(t, err)
+
+	resp, err = testClient.Do(req)
+	require.Nil(t, err)
+	require.Equal(t, 200, resp.StatusCode)
+
+	data, err = io.ReadAll(resp.Body)
+	require.Nil(t, err)
+
+	require.Nil(t, json.Unmarshal(data, &res))
+	req, err = http.NewRequest("POST", testServer.URL+"/api/test", nil)
+	require.Nil(t, err)
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", res.Data))
+
+	resp, err = testClient.Do(req)
+	require.Nil(t, err)
+	require.Equal(t, http.StatusForbidden, resp.StatusCode)
+
+	req, err = http.NewRequest("GET", testServer.URL+"/api/test/failed-roles-format", nil)
+	require.Nil(t, err)
+
+	resp, err = testClient.Do(req)
+	require.Nil(t, err)
+	require.Equal(t, 200, resp.StatusCode)
+
+	data, err = io.ReadAll(resp.Body)
+	require.Nil(t, err)
+
+	require.Nil(t, json.Unmarshal(data, &res))
+	req, err = http.NewRequest("POST", testServer.URL+"/api/test", nil)
+	require.Nil(t, err)
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", res.Data))
+
+	resp, err = testClient.Do(req)
 	require.Nil(t, err)
 	require.Equal(t, http.StatusForbidden, resp.StatusCode)
 }

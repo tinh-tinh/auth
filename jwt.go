@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/tinh-tinh/tinhtinh/v2/core"
 )
 
 type Jwt interface {
@@ -19,7 +18,6 @@ type JwtOptions struct {
 	PublicKey  string
 	Exp        time.Duration
 	IgnoreExp  bool
-	Factory    func(module core.Module) JwtOptions
 }
 
 func NewJwt(opt JwtOptions) Jwt {

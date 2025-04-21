@@ -30,12 +30,12 @@ func RoleGuard(ctrl core.RefProvider, ctx core.Ctx) bool {
 	}
 
 	roleIdx := slices.IndexFunc(roles, func(r string) bool {
-		userRoleIdx := slices.IndexFunc(userRoles, func(u interface{}) bool {
-			uStr, ok := u.(string)
+		userRoleIdx := slices.IndexFunc(userRoles, func(userRole interface{}) bool {
+			userRoleStr, ok := userRole.(string)
 			if !ok {
 				return false
 			}
-			return uStr == r
+			return userRoleStr == r
 		})
 		return userRoleIdx != -1
 	})
