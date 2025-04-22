@@ -6,9 +6,22 @@ const JWT_TOKEN core.Provide = "JWT_TOKEN"
 
 func Register(opt JwtOptions) core.Modules {
 	return func(module core.Module) core.Module {
-		if opt.Factory != nil {
-			opt = opt.Factory(module)
-		}
+		tokenModule := module.New(core.NewModuleOptions{})
+		tokenModule.NewProvider(core.ProviderOptions{
+			Name:  JWT_TOKEN,
+			Value: NewJwt(opt),
+		})
+		tokenModule.Export(JWT_TOKEN)
+
+		return tokenModule
+	}
+}
+
+type JwtOptionFactory func(ref core.RefProvider) JwtOptions
+
+func RegisterFactory(factory JwtOptionFactory) core.Modules {
+	return func(module core.Module) core.Module {
+		opt := factory(module)
 		tokenModule := module.New(core.NewModuleOptions{})
 		tokenModule.NewProvider(core.ProviderOptions{
 			Name:  JWT_TOKEN,
