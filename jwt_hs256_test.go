@@ -9,7 +9,7 @@ import (
 )
 
 func Test_HS256(t *testing.T) {
-	jwtService := NewJwtHS256(JwtOptions{
+	jwtService := NewJwtHS(JwtOptions{
 		Alg:    jwt.SigningMethodHS256,
 		Secret: "secret",
 		Exp:    time.Hour,
@@ -28,7 +28,7 @@ func Test_HS256(t *testing.T) {
 	_, err = jwtService.Verify("Abc")
 	require.Error(t, err)
 
-	jwtService2 := NewJwtHS256(JwtOptions{
+	jwtService2 := NewJwtHS(JwtOptions{
 		Alg:    jwt.SigningMethodHS256,
 		Secret: "abc",
 		Exp:    time.Second,
@@ -40,10 +40,10 @@ func Test_HS256(t *testing.T) {
 
 	// Case wrong secret
 	_, err = jwtService.Verify(token)
-	require.Error(t, err)
+	require.NotNil(t, err)
 
 	// Case expired
 	time.Sleep(3 * time.Second)
 	_, err = jwtService2.Verify(token)
-	require.Error(t, err)
+	require.NotNil(t, err)
 }
