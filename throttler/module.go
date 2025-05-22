@@ -44,6 +44,23 @@ func ForRoot(config *Config) core.Modules {
 	}
 }
 
+type ConfigFactory func(ref core.RefProvider) *Config
+
+func ForRootFactory(factory ConfigFactory) core.Modules {
+	return func(module core.Module) core.Module {
+		config := factory(module)
+		throttlerModule := module.New(core.NewModuleOptions{})
+
+		throttlerModule.NewProvider(core.ProviderOptions{
+			Name:  THROTTLER,
+			Value: New(config),
+		})
+		throttlerModule.Export(THROTTLER)
+
+		return throttlerModule
+	}
+}
+
 func Guard(ctrl core.RefProvider, ctx core.Ctx) bool {
 	ip := ctx.Headers("X-Forwarded-For")
 	if ip == "" {
