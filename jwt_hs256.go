@@ -69,3 +69,16 @@ func (hs *JwtHS) Verify(token string) (jwt.MapClaims, error) {
 
 	return claims, nil
 }
+
+func (hs *JwtHS) Decode(token string) (jwt.MapClaims, error) {
+	// Create an empty claims object or your own custom claims type
+	claims := jwt.MapClaims{}
+
+	// Parse the token without verifying the signature
+	_, _, err := jwt.NewParser().ParseUnverified(token, claims)
+	if err != nil {
+		return nil, err
+	}
+
+	return claims, nil
+}
