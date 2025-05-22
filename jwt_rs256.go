@@ -8,14 +8,16 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type JwtRS256 struct {
+type JwtRS struct {
+	Method     jwt.SigningMethod
 	PrivateKey string
 	PublicKey  string
 	Opt        SubOptions
 }
 
-func NewJwtRS256(opt JwtOptions) *JwtRS256 {
-	return &JwtRS256{
+func NewJwtRS(opt JwtOptions) *JwtRS {
+	return &JwtRS{
+		Method:     opt.Alg,
 		PrivateKey: opt.PrivateKey,
 		PublicKey:  opt.PublicKey,
 		Opt: SubOptions{
@@ -25,13 +27,13 @@ func NewJwtRS256(opt JwtOptions) *JwtRS256 {
 	}
 }
 
-func (rs256 *JwtRS256) Generate(payload jwt.MapClaims) (string, error) {
+func (rs *JwtRS) Generate(payload jwt.MapClaims) (string, error) {
 	payload["iat"] = time.Now().Unix()
-	payload["exp"] = time.Now().Add(rs256.Opt.Exp).Unix()
+	payload["exp"] = time.Now().Add(rs.Opt.Exp).Unix()
 
-	claims := jwt.NewWithClaims(jwt.SigningMethodRS256, payload)
+	claims := jwt.NewWithClaims(rs.Method, payload)
 
-	decodedPrivateKey, err := base64.StdEncoding.DecodeString(rs256.PrivateKey)
+	decodedPrivateKey, err := base64.StdEncoding.DecodeString(rs.PrivateKey)
 	if err != nil {
 		return "", fmt.Errorf("could not decode key: %w", err)
 	}
@@ -49,8 +51,8 @@ func (rs256 *JwtRS256) Generate(payload jwt.MapClaims) (string, error) {
 	return token, nil
 }
 
-func (rs256 *JwtRS256) Verify(token string) (jwt.MapClaims, error) {
-	decodedPublicKey, err := base64.StdEncoding.DecodeString(rs256.PublicKey)
+func (rs *JwtRS) Verify(token string) (jwt.MapClaims, error) {
+	decodedPublicKey, err := base64.StdEncoding.DecodeString(rs.PublicKey)
 	if err != nil {
 		return nil, fmt.Errorf("could not decode: %w", err)
 	}
@@ -79,7 +81,7 @@ func (rs256 *JwtRS256) Verify(token string) (jwt.MapClaims, error) {
 		return nil, fmt.Errorf("invalid token")
 	}
 
-	if !rs256.Opt.IgnoreExp && time.Now().Unix() > int64(exp) {
+	if !rs.Opt.IgnoreExp && time.Now().Unix() > int64(exp) {
 		return nil, fmt.Errorf("token expired")
 	}
 
