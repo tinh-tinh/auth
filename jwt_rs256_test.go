@@ -44,6 +44,20 @@ func Test_RS256(t *testing.T) {
 	time.Sleep(3 * time.Second)
 	_, err = jwtService2.Verify(token)
 	require.Error(t, err)
+
+	claims, err := jwtService.Decode(token)
+	require.Nil(t, err)
+	require.Equal(t, "bar", claims["foo"])
+
+	_, err = jwtService.Decode("bad.token")
+	require.NotNil(t, err)
+
+	claims, err = jwtService2.Decode(token)
+	require.Nil(t, err)
+	require.Equal(t, "bar", claims["foo"])
+
+	_, err = jwtService2.Decode("bad.token")
+	require.NotNil(t, err)
 }
 
 func Test_Failed(t *testing.T) {

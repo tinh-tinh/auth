@@ -9,6 +9,7 @@ import (
 
 type Jwt interface {
 	Generate(payload jwt.MapClaims) (string, error)
+	Decode(token string) (jwt.MapClaims, error)
 	Verify(token string) (jwt.MapClaims, error)
 }
 
