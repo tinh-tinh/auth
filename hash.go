@@ -42,7 +42,7 @@ func VerifyHash(hashedStr string, plainStr string) bool {
 func GenerateSalt(salt int) string {
 	const letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-"
 	ret := make([]byte, salt)
-	for i := 0; i < salt; i++ {
+	for i := range salt {
 		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(letters))))
 		if err != nil {
 			panic(err)

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/tinh-tinh/tinhtinh/v2/common"
 )
 
 type SubOptions struct {
@@ -28,9 +29,17 @@ func NewJwtHS(opt JwtOptions) *JwtHS {
 	}
 }
 
-func (hs *JwtHS) Generate(payload jwt.MapClaims) (string, error) {
+func (hs *JwtHS) Generate(payload jwt.MapClaims, opts ...GenOptions) (string, error) {
+	var exp time.Duration
+	if len(opts) > 0 {
+		options := common.MergeStruct(opts...)
+		exp = options.Exp
+	} else {
+		exp = hs.Opt.Exp
+	}
+
 	payload["iat"] = time.Now().Unix()
-	payload["exp"] = time.Now().Add(hs.Opt.Exp).Unix()
+	payload["exp"] = time.Now().Add(exp).Unix()
 
 	claims := jwt.NewWithClaims(hs.Method, payload)
 

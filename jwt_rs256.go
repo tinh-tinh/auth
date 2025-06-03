@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/tinh-tinh/tinhtinh/v2/common"
 )
 
 type JwtRS struct {
@@ -27,9 +28,17 @@ func NewJwtRS(opt JwtOptions) *JwtRS {
 	}
 }
 
-func (rs *JwtRS) Generate(payload jwt.MapClaims) (string, error) {
+func (rs *JwtRS) Generate(payload jwt.MapClaims, opts ...GenOptions) (string, error) {
+	var exp time.Duration
+	if len(opts) > 0 {
+		options := common.MergeStruct(opts...)
+		exp = options.Exp
+	} else {
+		exp = rs.Opt.Exp
+	}
+
 	payload["iat"] = time.Now().Unix()
-	payload["exp"] = time.Now().Add(rs.Opt.Exp).Unix()
+	payload["exp"] = time.Now().Add(exp).Unix()
 
 	claims := jwt.NewWithClaims(rs.Method, payload)
 
