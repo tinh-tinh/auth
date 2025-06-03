@@ -7,8 +7,12 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+type GenOptions struct {
+	Exp time.Duration
+}
+
 type Jwt interface {
-	Generate(payload jwt.MapClaims) (string, error)
+	Generate(payload jwt.MapClaims, opts ...GenOptions) (string, error)
 	Decode(token string) (jwt.MapClaims, error)
 	Verify(token string) (jwt.MapClaims, error)
 }

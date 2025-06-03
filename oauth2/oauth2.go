@@ -60,7 +60,7 @@ func controller(module core.Module) core.Controller {
 
 func (c *Config) SignInWithProvider() core.Handler {
 	return func(ctx core.Ctx) error {
-		provider := ctx.Param("provider")
+		provider := ctx.Path("provider")
 		q := ctx.Req().URL.Query()
 		q.Add("provider", provider)
 		ctx.Req().URL.RawQuery = q.Encode()
@@ -71,7 +71,7 @@ func (c *Config) SignInWithProvider() core.Handler {
 
 func (c *Config) CallbackHandler() core.Handler {
 	return func(ctx core.Ctx) error {
-		providers := ctx.Param("provider")
+		providers := ctx.Path("provider")
 		q := ctx.Req().URL.Query()
 		q.Add("provider", providers)
 		ctx.Req().URL.RawQuery = q.Encode()
