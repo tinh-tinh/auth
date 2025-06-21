@@ -2,7 +2,6 @@ package twofa_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -92,5 +91,5 @@ func TestModule(t *testing.T) {
 	data, err = io.ReadAll(resp.Body)
 	require.Nil(t, err)
 	require.Nil(t, json.Unmarshal(data, &res))
-	fmt.Println(res.Data)
+	require.False(t, res.Data.(bool), "Expected code validation to fail with incorrect code")
 }
