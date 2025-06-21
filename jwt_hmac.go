@@ -9,8 +9,8 @@ import (
 )
 
 type SubOptions struct {
-	Exp       time.Duration
-	IgnoreExp bool
+	Exp           time.Duration
+	SkipValidaton bool
 }
 type JwtHS struct {
 	Method jwt.SigningMethod
@@ -23,8 +23,8 @@ func NewJwtHS(opt JwtOptions) *JwtHS {
 		Method: opt.Alg,
 		Secret: opt.Secret,
 		Opt: SubOptions{
-			Exp:       opt.Exp,
-			IgnoreExp: opt.IgnoreExp,
+			Exp:           opt.Exp,
+			SkipValidaton: opt.SkipValidaton,
 		},
 	}
 }
@@ -52,12 +52,17 @@ func (hs *JwtHS) Generate(payload jwt.MapClaims, opts ...GenOptions) (string, er
 }
 
 func (hs *JwtHS) Verify(token string) (jwt.MapClaims, error) {
+	parseOptions := []jwt.ParserOption{}
+	if hs.Opt.SkipValidaton {
+		parseOptions = append(parseOptions, jwt.WithoutClaimsValidation())
+	}
+
 	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(hs.Secret), nil
-	})
+	}, parseOptions...)
 	if err != nil {
 		return nil, err
 	}
@@ -65,15 +70,6 @@ func (hs *JwtHS) Verify(token string) (jwt.MapClaims, error) {
 	claims, ok := parsedToken.Claims.(jwt.MapClaims)
 	if !ok || !parsedToken.Valid {
 		return nil, fmt.Errorf("invalid token")
-	}
-
-	exp, ok := claims["exp"].(float64)
-	if !ok {
-		return nil, fmt.Errorf("invalid token")
-	}
-
-	if !hs.Opt.IgnoreExp && time.Now().Unix() > int64(exp) {
-		return nil, fmt.Errorf("token expired")
 	}
 
 	return claims, nil
