@@ -18,12 +18,12 @@ type Jwt interface {
 }
 
 type JwtOptions struct {
-	Alg        jwt.SigningMethod
-	Secret     string
-	PrivateKey string
-	PublicKey  string
-	Exp        time.Duration
-	IgnoreExp  bool
+	Alg           jwt.SigningMethod
+	Secret        string
+	PrivateKey    string
+	PublicKey     string
+	Exp           time.Duration
+	SkipValidaton bool
 }
 
 func NewJwt(opt JwtOptions) Jwt {

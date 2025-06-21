@@ -32,7 +32,7 @@ func Test_HS256(t *testing.T) {
 	jwtService2 := auth.NewJwtHS(auth.JwtOptions{
 		Alg:    jwt.SigningMethodHS256,
 		Secret: "abc",
-		Exp:    time.Second,
+		Exp:    1 * time.Second,
 	})
 	token, err = jwtService2.Generate(jwt.MapClaims{
 		"foo": "bar",
@@ -47,6 +47,21 @@ func Test_HS256(t *testing.T) {
 	time.Sleep(3 * time.Second)
 	_, err = jwtService2.Verify(token)
 	require.NotNil(t, err)
+
+	// Case skip validation
+	jwtService3 := auth.NewJwtHS(auth.JwtOptions{
+		Alg:           jwt.SigningMethodHS256,
+		Secret:        "secret",
+		Exp:           1 * time.Second,
+		SkipValidaton: true,
+	})
+	token, err = jwtService3.Generate(jwt.MapClaims{
+		"foo": "bar",
+	})
+	require.Nil(t, err)
+	time.Sleep(3 * time.Second)
+	_, err = jwtService3.Verify(token)
+	require.Nil(t, err)
 }
 
 func Test_HS256_Exp(t *testing.T) {

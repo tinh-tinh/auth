@@ -22,8 +22,8 @@ func NewJwtRS(opt JwtOptions) *JwtRS {
 		PrivateKey: opt.PrivateKey,
 		PublicKey:  opt.PublicKey,
 		Opt: SubOptions{
-			Exp:       opt.Exp,
-			IgnoreExp: opt.IgnoreExp,
+			Exp:           opt.Exp,
+			SkipValidaton: opt.SkipValidaton,
 		},
 	}
 }
@@ -71,12 +71,17 @@ func (rs *JwtRS) Verify(token string) (jwt.MapClaims, error) {
 		return nil, fmt.Errorf("validate: parse key: %w", err)
 	}
 
+	parseOptions := []jwt.ParserOption{}
+	if rs.Opt.SkipValidaton {
+		parseOptions = append(parseOptions, jwt.WithoutClaimsValidation())
+	}
+
 	parsedToken, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, fmt.Errorf("unexpected method: %s", t.Header["alg"])
 		}
 		return key, nil
-	})
+	}, parseOptions...)
 	if err != nil {
 		return nil, err
 	}
@@ -84,14 +89,6 @@ func (rs *JwtRS) Verify(token string) (jwt.MapClaims, error) {
 	claims, ok := parsedToken.Claims.(jwt.MapClaims)
 	if !ok || !parsedToken.Valid {
 		return nil, fmt.Errorf("validate: invalid token")
-	}
-	exp, ok := claims["exp"].(float64)
-	if !ok {
-		return nil, fmt.Errorf("invalid token")
-	}
-
-	if !rs.Opt.IgnoreExp && time.Now().Unix() > int64(exp) {
-		return nil, fmt.Errorf("token expired")
 	}
 
 	return claims, nil
