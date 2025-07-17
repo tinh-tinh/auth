@@ -1,14 +1,18 @@
 package csrf
 
 import (
+	"fmt"
+
 	"github.com/tinh-tinh/tinhtinh/v2/common"
 	"github.com/tinh-tinh/tinhtinh/v2/core"
 )
 
-func Guard(ctrl core.RefProvider, ctx core.Ctx) bool {
-	csrf, ok := ctrl.Ref(CSRF_NAME).(*Config)
+func Guard(ctx core.Ctx) bool {
+	csrf, ok := ctx.Ref(CSRF_NAME).(*Config)
 	if !ok {
-		common.InternalServerException(ctx.Res(), "csrf not registered")
+		if err := common.InternalServerException(ctx.Res(), "csrf not registered"); err != nil {
+			fmt.Println(err)
+		}
 		return false
 	}
 

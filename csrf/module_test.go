@@ -262,3 +262,52 @@ func Test_Failed(t *testing.T) {
 	appMod := core.NewModule(core.NewModuleOptions{})
 	require.Nil(t, csrf.Inject(appMod))
 }
+
+func Test_NotRegister(t *testing.T) {
+	authController := func(module core.Module) core.Controller {
+		ctrl := module.NewController("test")
+
+		ctrl.Guard(csrf.Guard).Post("", func(ctx core.Ctx) error {
+			return ctx.JSON(core.Map{
+				"data": "ok",
+			})
+		})
+
+		return ctrl
+	}
+
+	authModule := func(module core.Module) core.Module {
+		mod := module.New(core.NewModuleOptions{
+			Controllers: []core.Controllers{authController},
+		})
+
+		return mod
+	}
+
+	appModule := func() core.Module {
+		appMod := core.NewModule(core.NewModuleOptions{
+			Imports: []core.Modules{
+				authModule,
+			},
+		})
+
+		return appMod
+	}
+
+	app := core.CreateFactory(appModule)
+	app.SetGlobalPrefix("api")
+
+	testServer := httptest.NewServer(app.PrepareBeforeListen())
+	defer testServer.Close()
+
+	testClient := testServer.Client()
+
+	req, err := http.NewRequest("POST", testServer.URL+"/api/test", nil)
+	require.Nil(t, err)
+
+	req.Header.Set("X-Session-Id", "123")
+
+	resp, err := testClient.Do(req)
+	require.Nil(t, err)
+	require.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+}

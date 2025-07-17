@@ -25,7 +25,6 @@ func Test_Guard(t *testing.T) {
 			data, err := jwtService.Generate(jwt.MapClaims{
 				"roles": []string{"admin", "user"},
 			})
-
 			if err != nil {
 				return common.BadRequestException(ctx.Res(), err.Error())
 			}

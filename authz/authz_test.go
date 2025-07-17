@@ -8,6 +8,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/casbin/casbin/v2"
 	"github.com/stretchr/testify/require"
 	"github.com/tinh-tinh/auth/v2/authz"
 	"github.com/tinh-tinh/tinhtinh/v2/core"
@@ -29,8 +30,8 @@ func Test_Panic(t *testing.T) {
 	require.Nil(t, authz.Inject(appModule))
 }
 
-func guard(ref core.RefProvider, ctx core.Ctx) bool {
-	enforcer := authz.Inject(ref)
+func guard(ctx core.Ctx) bool {
+	enforcer := ctx.Ref(authz.CASBIN).(*casbin.Enforcer)
 	if enforcer == nil {
 		log.Println("Enforcer is nil")
 		return false
@@ -131,7 +132,7 @@ m = r.sub == p.sub && keyMatch(r.obj, p.obj) && (r.act == p.act || p.act == "*")
 `
 
 	// Create and write file
-	err := os.WriteFile("model.conf", []byte(model), 0644)
+	err := os.WriteFile("model.conf", []byte(model), 0o644)
 	if err != nil {
 		log.Fatalln("Failed to write model.conf:", err)
 	}
