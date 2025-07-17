@@ -61,13 +61,13 @@ func ForRootFactory(factory ConfigFactory) core.Modules {
 	}
 }
 
-func Guard(ctrl core.RefProvider, ctx core.Ctx) bool {
+func Guard(ctx core.Ctx) bool {
 	ip := ctx.Headers("X-Forwarded-For")
 	if ip == "" {
 		ip = ctx.Req().RemoteAddr
 	}
 
-	throttler, ok := ctrl.Ref(THROTTLER).(*Throttler)
+	throttler, ok := ctx.Ref(THROTTLER).(*Throttler)
 	if !ok {
 		return true
 	}
