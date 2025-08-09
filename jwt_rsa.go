@@ -29,20 +29,22 @@ func NewJwtRS(opt JwtOptions) *JwtRS {
 }
 
 func (rs *JwtRS) Generate(payload jwt.MapClaims, opts ...GenOptions) (string, error) {
-	var exp time.Duration
+	opt := GenOptions{
+		Exp:        rs.Opt.Exp,
+		PrivateKey: rs.PrivateKey,
+	}
+
 	if len(opts) > 0 {
-		options := common.MergeStruct(opts...)
-		exp = options.Exp
-	} else {
-		exp = rs.Opt.Exp
+		temp := append(opts, opt)
+		opt = common.MergeStruct(temp...)
 	}
 
 	payload["iat"] = time.Now().Unix()
-	payload["exp"] = time.Now().Add(exp).Unix()
+	payload["exp"] = time.Now().Add(opt.Exp).Unix()
 
 	claims := jwt.NewWithClaims(rs.Method, payload)
 
-	decodedPrivateKey, err := base64.StdEncoding.DecodeString(rs.PrivateKey)
+	decodedPrivateKey, err := base64.StdEncoding.DecodeString(opt.PrivateKey)
 	if err != nil {
 		return "", fmt.Errorf("could not decode key: %w", err)
 	}
@@ -60,8 +62,17 @@ func (rs *JwtRS) Generate(payload jwt.MapClaims, opts ...GenOptions) (string, er
 	return token, nil
 }
 
-func (rs *JwtRS) Verify(token string) (jwt.MapClaims, error) {
-	decodedPublicKey, err := base64.StdEncoding.DecodeString(rs.PublicKey)
+func (rs *JwtRS) Verify(token string, opts ...VerifyOptions) (jwt.MapClaims, error) {
+	opt := VerifyOptions{
+		PublicKey: rs.PublicKey,
+	}
+
+	if len(opts) > 0 {
+		temp := append(opts, opt)
+		opt = common.MergeStruct(temp...)
+	}
+
+	decodedPublicKey, err := base64.StdEncoding.DecodeString(opt.PublicKey)
 	if err != nil {
 		return nil, fmt.Errorf("could not decode: %w", err)
 	}

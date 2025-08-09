@@ -30,20 +30,22 @@ func NewJwtHS(opt JwtOptions) *JwtHS {
 }
 
 func (hs *JwtHS) Generate(payload jwt.MapClaims, opts ...GenOptions) (string, error) {
-	var exp time.Duration
+	opt := GenOptions{
+		Exp:    hs.Opt.Exp,
+		Secret: hs.Secret,
+	}
+
 	if len(opts) > 0 {
-		options := common.MergeStruct(opts...)
-		exp = options.Exp
-	} else {
-		exp = hs.Opt.Exp
+		temp := append(opts, opt)
+		opt = common.MergeStruct(temp...)
 	}
 
 	payload["iat"] = time.Now().Unix()
-	payload["exp"] = time.Now().Add(exp).Unix()
+	payload["exp"] = time.Now().Add(opt.Exp).Unix()
 
 	claims := jwt.NewWithClaims(hs.Method, payload)
 
-	token, err := claims.SignedString([]byte(hs.Secret))
+	token, err := claims.SignedString([]byte(opt.Secret))
 	if err != nil {
 		return "", err
 	}
@@ -51,7 +53,16 @@ func (hs *JwtHS) Generate(payload jwt.MapClaims, opts ...GenOptions) (string, er
 	return token, nil
 }
 
-func (hs *JwtHS) Verify(token string) (jwt.MapClaims, error) {
+func (hs *JwtHS) Verify(token string, opts ...VerifyOptions) (jwt.MapClaims, error) {
+	opt := VerifyOptions{
+		Secret: hs.Secret,
+	}
+
+	if len(opts) > 0 {
+		temp := append(opts, opt)
+		opt = common.MergeStruct(temp...)
+	}
+
 	parseOptions := []jwt.ParserOption{}
 	if hs.Opt.SkipValidaton {
 		parseOptions = append(parseOptions, jwt.WithoutClaimsValidation())
@@ -61,7 +72,7 @@ func (hs *JwtHS) Verify(token string) (jwt.MapClaims, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(hs.Secret), nil
+		return []byte(opt.Secret), nil
 	}, parseOptions...)
 	if err != nil {
 		return nil, err

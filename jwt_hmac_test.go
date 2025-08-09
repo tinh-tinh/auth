@@ -80,3 +80,20 @@ func Test_HS256_Exp(t *testing.T) {
 	_, err = jwtService.Verify(token)
 	require.NotNil(t, err)
 }
+
+func Test_HS256_Nil_Constructor(t *testing.T) {
+	jwtService := auth.NewJwtHS(auth.JwtOptions{
+		Alg: jwt.SigningMethodHS256,
+		Exp: time.Hour,
+	})
+
+	token, err := jwtService.Generate(jwt.MapClaims{
+		"foo": "bar",
+	}, auth.GenOptions{Secret: "secret"})
+	require.Nil(t, err)
+
+	_, err = jwtService.Verify(token, auth.VerifyOptions{
+		Secret: "secret",
+	})
+	require.Nil(t, err)
+}

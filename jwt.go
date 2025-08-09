@@ -8,13 +8,20 @@ import (
 )
 
 type GenOptions struct {
-	Exp time.Duration
+	Exp        time.Duration
+	Secret     string
+	PrivateKey string
+}
+
+type VerifyOptions struct {
+	Secret    string
+	PublicKey string
 }
 
 type Jwt interface {
 	Generate(payload jwt.MapClaims, opts ...GenOptions) (string, error)
 	Decode(token string) (jwt.MapClaims, error)
-	Verify(token string) (jwt.MapClaims, error)
+	Verify(token string, opts ...VerifyOptions) (jwt.MapClaims, error)
 }
 
 type JwtOptions struct {
